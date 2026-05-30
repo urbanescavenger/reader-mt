@@ -1,6 +1,5 @@
 package io.legado.app.utils
 
-import android.text.TextUtils
 import io.legado.app.lib.icu4j.CharsetDetector
 import org.jsoup.Jsoup
 import java.io.File
@@ -13,25 +12,24 @@ import java.io.FileInputStream
 object EncodingDetect {
 
     private val headTagRegex = "(?i)<head>[\\s\\S]*?</head>".toRegex()
-    private val headOpenBytes = "<head>".toByteArray()
-    private val headCloseBytes = "</head>".toByteArray()
 
     fun getHtmlEncode(bytes: ByteArray): String {
         try {
+            val htmlStr = String(bytes)
             var head: String? = null
-            val startIndex = bytes.indexOf(headOpenBytes)
+            val startIndex = htmlStr.indexOf("<head>", ignoreCase = true)
             if (startIndex > -1) {
-                val endIndex = bytes.indexOf(headCloseBytes, startIndex)
+                val endIndex = htmlStr.indexOf("</head>", startIndex, ignoreCase = true)
                 if (endIndex > -1) {
-                    head = String(bytes.copyOfRange(startIndex, endIndex + headCloseBytes.size))
+                    head = htmlStr.substring(startIndex, endIndex + "</head>".length)
                 }
             }
-            val doc = Jsoup.parseBodyFragment(head ?: headTagRegex.find(String(bytes))!!.value)
+            val doc = Jsoup.parseBodyFragment(head ?: headTagRegex.find(htmlStr)!!.value)
             val metaTags = doc.getElementsByTag("meta")
             var charsetStr: String
             for (metaTag in metaTags) {
                 charsetStr = metaTag.attr("charset")
-                if (!TextUtils.isEmpty(charsetStr)) {
+                if (charsetStr.isNotEmpty()) {
                     return charsetStr
                 }
                 val httpEquiv = metaTag.attr("http-equiv")
@@ -43,7 +41,7 @@ object EncodingDetect {
                     } else {
                         content.substringAfter(";")
                     }
-                    if (!TextUtils.isEmpty(charsetStr)) {
+                    if (charsetStr.isNotEmpty()) {
                         return charsetStr
                     }
                 }

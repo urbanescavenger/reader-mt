@@ -6,8 +6,13 @@ services:
 # 公众号汇总 : [https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MjM5MzMyMDgyMA==&action=getalbum&album_id=2397535253763801090#wechat_redirect](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MjM5MzMyMDgyMA==&action=getalbum&album_id=2397535253763801090#wechat_redirect)
 # 手动更新方式 : docker-compose pull && docker-compose up -d
   reader:
-    image: hectorqin/reader
-    #image: hectorqin/reader:openj9-latest #docker镜像，arm64架构或小内存机器优先使用此镜像.启用需删除上一行
+    # 镜像说明（三选一）：
+    #   标准版 (161MB)：Amazon Corretto JRE，通用场景首选，兼容性最好
+    #   Slim版 (256MB)：jlink 定制 JRE，仅含必要模块
+    #   OpenJ9版 (616MB)：IBM Semeru JRE，启动快、运行时内存低，适合 ARM64 或小内存服务器
+    image: changshengyu/reader:latest
+    #image: changshengyu/reader:slim-latest
+    #image: changshengyu/reader:openj9-latest
     container_name: reader #容器名 可自行修改
     restart: always
     ports:

@@ -15,17 +15,18 @@ RUN \
     gradle -b cli.gradle assemble --info; \
     mv ./build/libs/*.jar ./build/libs/reader.jar
 
-FROM amazoncorretto:8u442-alpine3.21-jre
+FROM ibm-semeru-runtimes:open-8-jre
 # Install base packages
 RUN \
-    apk add --no-cache ca-certificates tini tzdata; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends ca-certificates tini tzdata; \
     update-ca-certificates; \
-    rm -rf /var/cache/apk/*;
+    rm -rf /var/lib/apt/lists/*;
 
 # 时区
 ENV TZ=Asia/Shanghai
 
 EXPOSE 8080
-ENTRYPOINT ["/sbin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--"]
 COPY --from=build-env /app/build/libs/reader.jar /app/bin/reader.jar
 CMD ["java", "-jar", "/app/bin/reader.jar" ]
