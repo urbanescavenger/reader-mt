@@ -1163,8 +1163,9 @@ export default {
       if (
         !refresh &&
         this.chapterContentCache &&
-        this.chapterContentCache.chapters[index] &&
-        !this.chapterContentCache.chapters[index].error
+        this.chapterContentCache[this.readingBook.bookUrl] &&
+        this.chapterContentCache[this.readingBook.bookUrl].chapters[index] &&
+        !this.chapterContentCache[this.readingBook.bookUrl].chapters[index].error
       ) {
         if (
           index >= this.chapterIndex - this.showPrevChapterSize &&
@@ -1221,29 +1222,27 @@ export default {
       );
     },
     addChapterContentToCache(chapter) {
-      if (
-        !this.chapterContentCache ||
-        this.chapterContentCache.bookUrl !== this.readingBook.bookUrl
-      ) {
-        this.chapterContentCache = {
-          bookUrl: this.readingBook.bookUrl,
-          chapters: {}
-        };
+      const bookUrl = this.readingBook.bookUrl;
+      if (!this.chapterContentCache) {
+        this.chapterContentCache = {};
       }
+      if (!this.chapterContentCache[bookUrl]) {
+        this.chapterContentCache[bookUrl] = { chapters: {} };
+      }
+      const cache = this.chapterContentCache[bookUrl];
       if (
-        typeof this.chapterContentCache.chapters[chapter.index] ===
-        "undefined" || // 没有缓存
-        !chapter.error || // 当前内容正确
-        this.chapterContentCache.chapters[chapter.index].error // 缓存内容错误
+        typeof cache.chapters[chapter.index] === "undefined" ||
+        !chapter.error ||
+        cache.chapters[chapter.index].error
       ) {
-        // 查询是否卷名
         chapter.isVolume = !!(this.readingBook.catalog[chapter.index] || {})
           .isVolume;
-        this.chapterContentCache.chapters[chapter.index] = chapter;
+        cache.chapters[chapter.index] = chapter;
       }
     },
     computeShowChapterList(reset) {
-      if (!this.chapterContentCache) {
+      const cache = this.chapterContentCache && this.chapterContentCache[this.readingBook.bookUrl];
+      if (!cache) {
         return new Promise(resolve => {
           setTimeout(() => {
             this.computeShowChapterList(reset).then(resolve);
@@ -1267,14 +1266,14 @@ export default {
         i <= this.chapterIndex + this.showNextChapterSize;
         i++
       ) {
-        if (!this.chapterContentCache.chapters[i]) {
+        if (!cache.chapters[i]) {
           waitPromise.push(this.loadShowChapter(i));
           continue;
         }
         list.push({
-          ...this.chapterContentCache.chapters[i],
+          ...cache.chapters[i],
           content: this.filterContent(
-            this.chapterContentCache.chapters[i].content
+            cache.chapters[i].content
           )
         });
       }
