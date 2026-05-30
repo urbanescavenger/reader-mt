@@ -548,6 +548,18 @@
           书海
         </div>
       </div>
+      <div
+        class="shelf-search-wrapper"
+        v-if="!isSearchResult && showBookEditButton"
+      >
+        <el-input
+          v-model="shelfSearch"
+          placeholder="搜索书名或作者"
+          size="small"
+          clearable
+          prefix-icon="el-icon-search"
+        ></el-input>
+      </div>
       <div class="book-group-wrapper" v-if="!isSearchResult">
         <el-tabs class="book-group-tabs" v-model="showBookGroupString" stretch>
           <el-tab-pane
@@ -1036,6 +1048,7 @@ export default {
       searchLastIndex: -1,
 
       showBookEditButton: false,
+      shelfSearch: "",
 
       popExploreVisible: false,
       loadingMore: false,
@@ -2791,7 +2804,14 @@ export default {
       }
     },
     bookList() {
-      return this.isSearchResult ? this.searchResult : this.showShelfBooks;
+      if (this.isSearchResult) return this.searchResult;
+      const q = this.shelfSearch.trim().toLowerCase();
+      if (!q) return this.showShelfBooks;
+      return this.showShelfBooks.filter(
+        v =>
+          v.name.toLowerCase().includes(q) ||
+          (v.author || "").toLowerCase().includes(q)
+      );
     },
     bookCoverList() {
       return this.bookList
@@ -3225,6 +3245,10 @@ export default {
     >>>.el-loading-text {
       font-weight: 500;
       color: #B5B5B5;
+    }
+
+    .shelf-search-wrapper {
+      padding: 0 0 8px 0;
     }
 
     .book-group-wrapper {
