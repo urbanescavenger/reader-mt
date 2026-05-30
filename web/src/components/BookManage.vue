@@ -18,9 +18,17 @@
       </span>
     </div>
     <div class="source-container table-container">
+      <el-input
+        v-model="searchQuery"
+        placeholder="搜索书名或作者"
+        size="small"
+        clearable
+        class="search-input"
+        prefix-icon="el-icon-search"
+      ></el-input>
       <el-table
-        :data="bookList"
-        :height="dialogContentHeight"
+        :data="filteredBookList"
+        :height="dialogContentHeight - 42"
         @selection-change="manageBookSelection = $event"
       >
         <el-table-column
@@ -178,6 +186,7 @@ export default {
   name: "BookManage",
   data() {
     return {
+      searchQuery: "",
       bookList: [],
       manageBookSelection: []
     };
@@ -185,6 +194,15 @@ export default {
   props: ["show"],
   computed: {
     ...mapGetters(["dialogWidth", "dialogTop", "dialogContentHeight"]),
+    filteredBookList() {
+      const q = this.searchQuery.trim().toLowerCase();
+      if (!q) return this.bookList;
+      return this.bookList.filter(
+        v =>
+          v.name.toLowerCase().includes(q) ||
+          (v.author || "").toLowerCase().includes(q)
+      );
+    },
     bookGroupList() {
       return this.$store.state.bookGroupList.filter(v => v.groupId > 0);
     },
@@ -624,6 +642,9 @@ export default {
   }
 }
 .source-container {
+  .search-input {
+    margin-bottom: 10px;
+  }
   .text-button {
     padding: 3px 5px;
   }
