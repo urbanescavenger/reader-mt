@@ -10,8 +10,9 @@ ADD --chown=gradle:gradle . /app
 WORKDIR /app
 COPY --from=build-web /app/web/dist /app/src/main/resources/web
 RUN \
+ENV JAVA_TOOL_OPTIONS="-Dhttps.protocols=TLSv1.2,TLSv1.3"
+RUN \
     rm src/main/java/com/htmake/reader/ReaderUIApplication.kt; \
-    sed -i 's/org.gradle.jvmargs=-Xmx2048m/org.gradle.jvmargs=-Xmx2048m -Dhttps.protocols=TLSv1.2,TLSv1.3/' gradle.properties; \
     gradle -b cli.gradle assemble --info; \
     mv ./build/libs/*.jar ./build/libs/reader.jar
 
