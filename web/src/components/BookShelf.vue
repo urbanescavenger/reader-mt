@@ -211,6 +211,9 @@ export default {
     overflow: auto;
 
     .shelfbook-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
 
       .book-item {
         width: 100%;
@@ -254,6 +257,17 @@ export default {
             color: #EB4259;
           }
         }
+      }
+    }
+  }
+
+  @media (min-width: 900px) {
+    .popup-wrapper .data-wrapper .shelfbook-list {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 16px 24px;
+      .book-item {
+        width: calc(25% - 18px);
       }
     }
   }
