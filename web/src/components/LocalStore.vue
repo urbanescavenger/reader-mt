@@ -13,7 +13,7 @@
   >
     <div class="source-container table-container">
       <el-table
-        :data="localFileList"
+        :data="showlocalFileList"
         :height="dialogContentHeight"
         @selection-change="localFileSelection = $event"
       >
@@ -53,6 +53,13 @@
           width="120px"
         ></el-table-column>
         <el-table-column label="操作" width="100px">
+          <template slot="header">
+            <el-input
+              v-model="search"
+              size="mini"
+              placeholder="输入关键字搜索"
+            />
+          </template>
           <template slot-scope="scope">
             <el-button
               type="text"
@@ -122,13 +129,33 @@ export default {
     return {
       localCurrentPath: "/",
       localFileList: [],
-
+      search: "",
+      loadMoreLimit: false,
       localFileSelection: []
     };
   },
   props: ["show"],
   computed: {
-    ...mapGetters(["dialogWidth", "dialogTop", "dialogContentHeight"])
+    ...mapGetters(["dialogWidth", "dialogTop", "dialogContentHeight"]),
+    showlocalFileList() {
+      if (this.search.trim().length > 2) {
+        return this.localFileList.filter(v => {
+          return v.name.toLowerCase().includes(this.search.toLowerCase());
+        });
+      }
+      if (this.localFileList.length > 101 && !this.loadMoreLimit) {
+        let newList = this.localFileList.slice(0, 101);
+        newList.push({
+          name: `加载更多 ${this.localFileList.length - 101} 个结果`,
+          isDirectory: true,
+          toParent: true,
+          path: false,
+          loadMore: true
+        });
+        return newList;
+      }
+      return this.localFileList;
+    }
   },
   watch: {
     show(isVisible) {
@@ -162,7 +189,11 @@ export default {
     cancel() {
       this.$emit("setShow", false);
     },
-    showLocalStoreFile(path) {
+    showLocalStoreFile(path, loadMore) {
+      if (!path && loadMore) {
+        this.loadMoreLimit = true;
+        return;
+      }
       this.localCurrentPath = path || "/";
       Axios.get(this.api + "/getLocalStoreFileList", {
         params: {
@@ -179,7 +210,7 @@ export default {
                 name: "..",
                 isDirectory: true,
                 toParent: true,
-                path: "/" + paths.join("/")
+                path: "more"
               });
             }
             this.localFileList = res.data.data;
