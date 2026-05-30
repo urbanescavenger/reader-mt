@@ -1222,11 +1222,16 @@ export default {
       );
     },
     addChapterContentToCache(chapter) {
+      const MAX_CACHED_BOOKS = 3;
       const bookUrl = this.readingBook.bookUrl;
       if (!this.chapterContentCache) {
         this.chapterContentCache = {};
       }
       if (!this.chapterContentCache[bookUrl]) {
+        const keys = Object.keys(this.chapterContentCache);
+        if (keys.length >= MAX_CACHED_BOOKS) {
+          delete this.chapterContentCache[keys[0]];
+        }
         this.chapterContentCache[bookUrl] = { chapters: {} };
       }
       const cache = this.chapterContentCache[bookUrl];
