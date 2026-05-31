@@ -9,7 +9,7 @@ FROM gradle:7-jdk8 AS build-env
 ADD --chown=gradle:gradle . /app
 WORKDIR /app
 COPY --from=build-web /app/web/dist /app/src/main/resources/web
-ENV JAVA_TOOL_OPTIONS="-Dhttps.protocols=TLSv1.2,TLSv1.3"
+ENV JAVA_TOOL_OPTIONS="-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2,TLSv1.3"
 RUN \
     rm src/main/java/com/htmake/reader/ReaderUIApplication.kt; \
     gradle -b cli.gradle assemble --info; \

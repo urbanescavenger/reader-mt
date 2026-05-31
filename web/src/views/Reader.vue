@@ -262,8 +262,8 @@ import Animate from "../plugins/animate";
 import { setCache, getCache } from "../plugins/cache";
 import { simplized, traditionalized } from "../plugins/chinese";
 import {
+  cacheFirstRequest,
   LimitResquest,
-  networkFirstRequest,
   editDistance
 } from "../plugins/helper";
 import { defaultReplaceRule, defaultBookmark } from "../plugins/config.js";
@@ -970,14 +970,15 @@ export default {
         // 来自搜索结果，请求需要带上 书源链接
         params.bookSourceUrl = this.$store.getters.readingBook.origin;
       }
-      return networkFirstRequest(
+      return cacheFirstRequest(
         () => Axios.post(this.api + "/getChapterList", params),
         this.$store.getters.readingBook.name +
         "_" +
         this.$store.getters.readingBook.author +
         "@" +
         this.$store.getters.readingBook.bookUrl +
-        "@chapterList"
+        "@chapterList",
+        refresh
       );
     },
     refreshCatalog() {
