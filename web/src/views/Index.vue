@@ -1829,6 +1829,10 @@ export default {
             } else {
               this.$message.error("远程书源文件错误");
             }
+          } else {
+            this.$message.error(
+              (res.data && res.data.errorMsg) || "读取远程书源文件失败"
+            );
           }
         },
         error => {
