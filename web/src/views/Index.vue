@@ -1817,6 +1817,9 @@ export default {
                 const data = JSON.parse(v);
                 if (Array.isArray(data)) {
                   sourceList = sourceList.concat(data);
+                } else if (data && typeof data === "object") {
+                  // 单个源对象(如 yckceo /id/{id}.json 单源定义)也接受
+                  sourceList.push(data);
                 }
               } catch (error) {
                 //
