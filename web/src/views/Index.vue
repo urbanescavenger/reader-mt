@@ -2013,7 +2013,27 @@ export default {
               timeout: this.checkBookSourceConfig.timeout,
               silent: true
             }
-          );
+          ).then(res => {
+            // 校验时:只有"成功且有搜索结果"才算可用,其余(失败/无结果)标失效
+            if (this.$store.state.failureIncludeTimeout) {
+              const data = res && res.data;
+              const ok =
+                data &&
+                data.isSuccess &&
+                Array.isArray(data.data) &&
+                data.data.length > 0;
+              if (!ok) {
+                this.$store.commit("addFailureBookSource", {
+                  bookSourceUrl: v.bookSourceUrl,
+                  errorMsg:
+                    !data || !data.isSuccess
+                      ? (data && data.errorMsg) || "搜索失败"
+                      : "无搜索结果"
+                });
+              }
+            }
+            return res;
+          });
         });
       });
     },
