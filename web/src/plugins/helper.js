@@ -200,3 +200,25 @@ export const removeFont = function(fontName) {
     node.remove();
   }
 };
+
+// 把书源校验的原始错误信息归类成简短中文失效类型,便于在"错误信息"列一眼区分
+export const classifyBookSourceError = function(rawMsg) {
+  const msg = String(rawMsg || "");
+  if (!msg) return "未知错误";
+  if (/无搜索结果/.test(msg)) return "无搜索结果";
+  if (/timeout|超时/i.test(msg)) return "请求超时";
+  if (/Network Error/i.test(msg)) return "网络连接失败";
+  if (/UnknownHostException|Unknown host/i.test(msg)) return "域名解析失败";
+  if (/SSLHandshakeException|SSL|certificate/i.test(msg)) return "SSL握手失败";
+  if (/Connection reset|SocketException/i.test(msg)) return "连接被重置";
+  if (/ConnectException|Failed to connect/i.test(msg)) return "连接失败";
+  const code = msg.match(/responseCode:\s*(\d+)/);
+  if (code) {
+    const c = code[1];
+    if (c === "403") return "403 禁止访问";
+    if (c === "404") return "404 未找到";
+    if (c[0] === "5") return "服务器错误 " + c;
+    return "HTTP " + c;
+  }
+  return msg;
+};

@@ -1029,7 +1029,7 @@ import Axios from "../plugins/axios";
 import { errorTypeList } from "../plugins/config";
 import { setCache, getCache } from "../plugins/cache";
 import eventBus from "../plugins/eventBus";
-import { formatSize, LimitResquest } from "../plugins/helper";
+import { formatSize, LimitResquest, classifyBookSourceError } from "../plugins/helper";
 const buildURL = require("axios/lib/helpers/buildURL");
 import { isInContainer } from "element-ui/src/utils/dom";
 import Vue from "vue";
@@ -2027,7 +2027,7 @@ export default {
                   bookSourceUrl: v.bookSourceUrl,
                   errorMsg:
                     !data || !data.isSuccess
-                      ? (data && data.errorMsg) || "搜索失败"
+                      ? classifyBookSourceError((data && data.errorMsg) || "搜索失败")
                       : "无搜索结果"
                 });
               }

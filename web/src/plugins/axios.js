@@ -1,6 +1,7 @@
 import Axios from "axios";
 import { Message, MessageBox } from "element-ui";
 import { errorTypeList } from "./config";
+import { classifyBookSourceError } from "./helper";
 import store from "./vuex";
 
 const service = Axios.create({
@@ -68,7 +69,7 @@ export const request = async ({
   const response = await service(query).catch(e => {
     if (params.bookSourceUrl && store.state.failureIncludeTimeout) {
       // 校验书源时,任何请求失败都判为失效(含 Network Error/连接重置/SSL 失败/超时等)
-      const errorMsg = e.toString();
+      const errorMsg = classifyBookSourceError(e.toString());
       window.errorMsgList = window.errorMsgList || [];
       window.errorMsgList.push(errorMsg);
       store.commit("addFailureBookSource", {
