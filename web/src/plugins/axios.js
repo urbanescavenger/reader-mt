@@ -67,16 +67,14 @@ export const request = async ({
   };
   const response = await service(query).catch(e => {
     if (params.bookSourceUrl && store.state.failureIncludeTimeout) {
-      // 判断是否失效书源
+      // 校验书源时,任何请求失败都判为失效(含 Network Error/连接重置/SSL 失败/超时等)
       const errorMsg = e.toString();
       window.errorMsgList = window.errorMsgList || [];
       window.errorMsgList.push(errorMsg);
-      if (errorMsg.indexOf("timeout") >= 0) {
-        store.commit("addFailureBookSource", {
-          bookSourceUrl: params.bookSourceUrl,
-          errorMsg
-        });
-      }
+      store.commit("addFailureBookSource", {
+        bookSourceUrl: params.bookSourceUrl,
+        errorMsg
+      });
     }
     throw e;
   });

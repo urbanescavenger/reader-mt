@@ -886,6 +886,13 @@
           >{{ isCheckingBookSource ? "正在" : "" }}检测书源
           {{ checkBookSourceTip }}</el-button
         >
+        <el-button
+          v-if="isCheckingBookSource"
+          @click="cancelCheckBookSource"
+          size="medium"
+          style="margin-bottom: 5px; margin-left: 8px;"
+          >停止</el-button
+        >
         <el-button @click="showBookSourceManageDialog = false" size="medium"
           >取消</el-button
         >
@@ -1979,13 +1986,21 @@ export default {
         this.checkBookSourceConfig.concurrent,
         handler => {
           this.checkBookSourceTip =
-            handler.requestCount + "/" + this.bookSourceList.length;
+            "已检 " +
+            handler.requestCount +
+            "/" +
+            this.bookSourceList.length +
+            " 成功 " +
+            (handler.requestCount - handler.errorCount) +
+            " 失败 " +
+            handler.errorCount;
           if (handler.isEnd()) {
             this.isCheckingBookSource = false;
             this.$store.commit("setFailureIncludeTimeout", false);
           }
         }
       );
+      this.checkLimitFunc = limitFunc;
       this.bookSourceList.forEach(v => {
         limitFunc(() => {
           return Axios.post(
@@ -2001,6 +2016,13 @@ export default {
           );
         });
       });
+    },
+    cancelCheckBookSource() {
+      if (this.checkLimitFunc) {
+        this.checkLimitFunc.cancel();
+      }
+      this.isCheckingBookSource = false;
+      this.$store.commit("setFailureIncludeTimeout", false);
     },
     async deleteBookSourceList() {
       if (!this.manageSourceSelection.length) {
