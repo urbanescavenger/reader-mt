@@ -209,6 +209,7 @@ class BookSourceController(coroutineContext: CoroutineContext): BaseController(c
 
     suspend fun getBookSources(context: RoutingContext): ReturnData {
         val returnData = ReturnData()
+        context.response().putHeader("Cache-Control", "no-store")
         checkAuth(context)
         var simple: Int = 0
         if (context.request().method() == HttpMethod.POST) {

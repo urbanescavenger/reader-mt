@@ -2072,6 +2072,12 @@ export default {
             );
             this.manageSourceSelection = [];
             this.$message.success("删除书源成功");
+            // 清前端缓存,确保 loadBookSource(true) 从后端拿到最新书源数据
+            if (window.$cacheStorage && this.currentUserName) {
+              window.$cacheStorage.removeItem(
+                "localCache@bookSourceList@" + this.currentUserName
+              );
+            }
             this.loadBookSource(true);
           }
         },
