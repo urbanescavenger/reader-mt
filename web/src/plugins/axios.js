@@ -67,13 +67,14 @@ export const request = async ({
     ...options
   };
   const response = await service(query).catch(e => {
-    if (params.bookSourceUrl && store.state.failureIncludeTimeout) {
+    if (data.bookSourceUrl && store.state.failureIncludeTimeout) {
       // 校验书源时,任何请求失败都判为失效(含 Network Error/连接重置/SSL 失败/超时等)
+      // bookSourceUrl 在 body(data),不在 query params
       const errorMsg = classifyBookSourceError(e.toString());
       window.errorMsgList = window.errorMsgList || [];
       window.errorMsgList.push(errorMsg);
       store.commit("addFailureBookSource", {
-        bookSourceUrl: params.bookSourceUrl,
+        bookSourceUrl: data.bookSourceUrl,
         errorMsg
       });
     }
