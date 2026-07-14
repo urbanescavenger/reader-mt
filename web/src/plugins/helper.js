@@ -208,10 +208,16 @@ export const classifyBookSourceError = function(rawMsg) {
   if (/无搜索结果/.test(msg)) return "无搜索结果";
   if (/timeout|超时/i.test(msg)) return "请求超时";
   if (/Network Error/i.test(msg)) return "网络连接失败";
-  if (/UnknownHostException|Unknown host/i.test(msg)) return "域名解析失败";
+  if (/UnknownHostException|Unknown host|Name does not resolve|Failed to resolve/i.test(msg))
+    return "域名解析失败";
   if (/SSLHandshakeException|SSL|certificate/i.test(msg)) return "SSL握手失败";
-  if (/Connection reset|SocketException/i.test(msg)) return "连接被重置";
+  if (/Connection reset|SocketException|stream reset|StreamReset/i.test(msg))
+    return "连接被重置";
+  if (/EOFException/i.test(msg)) return "连接异常断开";
   if (/ConnectException|Failed to connect/i.test(msg)) return "连接失败";
+  if (/ProtocolException/i.test(msg)) return "协议错误";
+  if (/UnsupportedEncoding|JsonSyntax|ParseException|解析失败/i.test(msg))
+    return "解析失败";
   const code = msg.match(/responseCode:\s*(\d+)/);
   if (code) {
     const c = code[1];
@@ -220,5 +226,5 @@ export const classifyBookSourceError = function(rawMsg) {
     if (c[0] === "5") return "服务器错误 " + c;
     return "HTTP " + c;
   }
-  return msg;
+  return "其它错误";
 };

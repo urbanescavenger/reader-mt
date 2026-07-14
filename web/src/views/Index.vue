@@ -835,6 +835,7 @@
             property="errorMsg"
             label="错误信息"
             min-width="120"
+            show-overflow-tooltip
             v-if="isShowFailureBookSource"
           ></el-table-column>
           <el-table-column label="书架书籍" min-width="120">
@@ -2963,7 +2964,11 @@ export default {
         groups.add("未分组");
         return Array.from(groups);
       } else {
-        return [].concat(errorTypeList).concat(["timeout"]);
+        const types = new Set();
+        this.$store.state.failureBookSource.forEach(v => {
+          if (v.errorMsg) types.add(v.errorMsg);
+        });
+        return Array.from(types);
       }
     },
     bookSourceShowLength() {
@@ -2976,7 +2981,7 @@ export default {
       if (this.isShowFailureBookSource) {
         return this.bookSourceShowList.filter(v =>
           this.showSourceGroup
-            ? v.errorMsg.indexOf(this.showSourceGroup) >= 0
+            ? v.errorMsg === this.showSourceGroup
             : true
         );
       } else {
