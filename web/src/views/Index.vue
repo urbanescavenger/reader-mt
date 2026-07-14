@@ -1027,10 +1027,13 @@ import Explore from "../components/Explore.vue";
 import LocalStore from "../components/LocalStore.vue";
 import WebDAV from "../components/WebDAV.vue";
 import Axios from "../plugins/axios";
-import { errorTypeList } from "../plugins/config";
 import { setCache, getCache } from "../plugins/cache";
 import eventBus from "../plugins/eventBus";
-import { formatSize, LimitResquest, classifyBookSourceError } from "../plugins/helper";
+import {
+  formatSize,
+  LimitResquest,
+  classifyBookSourceError
+} from "../plugins/helper";
 const buildURL = require("axios/lib/helpers/buildURL");
 import { isInContainer } from "element-ui/src/utils/dom";
 import Vue from "vue";
